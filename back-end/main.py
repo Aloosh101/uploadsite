@@ -6,7 +6,7 @@ from io import BytesIO
 from threading import Lock
 
 app = FastAPI()
-# fuck
+
 origins = [
     "http://localhost",
     "http://localhost:8080",
