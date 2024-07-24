@@ -27,7 +27,7 @@ class MyData(BaseModel):
 
 datalist = {} 
 IDtele = {}
-target = -1002070698546
+target = "https://t.me/hiasrf"
 
 @app.post('/api/data')
 async def handle_data(mydata: MyData):
