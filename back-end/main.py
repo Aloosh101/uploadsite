@@ -27,6 +27,7 @@ class MyData(BaseModel):
 
 datalist = {} 
 IDtele = {}
+target = -1002070698546
 
 @app.post('/api/data')
 async def handle_data(mydata: MyData):
@@ -43,7 +44,7 @@ async def handle_data(mydata: MyData):
     print(len(datalist[id]))
     if message == "done":
             print(f"Data for ID {id} is done: {datalist[id]}")
-            client = TeleSql(-1002070698546, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
+            client = TeleSql(target, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
             client = await client.connect()
             merger = FileMerger(datalist[id]).merge_data()
             encrypte = AESCipher("slmle?43718slmle#$%!?slmle@#~slmle").decrypt_string(str(merger))
@@ -56,7 +57,7 @@ async def handle_data(mydata: MyData):
             return token
     elif len(datalist[id]) == 10:
             print(f"Data for ID {id} is full: {datalist[id]}")
-            client = TeleSql(-1002070698546, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
+            client = TeleSql(target, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
             client = await client.connect()
             merger = FileMerger(datalist[id]).merge_data()
             encrypte = AESCipher("slmle?43718slmle#$%!?slmle@#~slmle").decrypt_string(str(merger))
