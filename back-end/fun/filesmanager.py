@@ -35,7 +35,7 @@ class FileMerger:
 
     def merge_data(self):
         try:
-            self.output_data = b"".join(self.chunk_data_list)
+            self.output_data = "".join(self.chunk_data_list)
             return self.output_data
         except Exception as e:
             error(f"merge data error caused by: {e}")
