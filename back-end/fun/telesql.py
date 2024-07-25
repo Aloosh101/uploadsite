@@ -11,6 +11,7 @@ basicConfig(level=INFO)
 def get_file_size(file_path):
     try:
         file_size = os.path.getsize(file_path)
+        info(f"I got the file size: {file_size}")
         return file_size
     except FileNotFoundError:
         error(f"File '{file_path}' not found.")
