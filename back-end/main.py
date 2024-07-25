@@ -28,6 +28,7 @@ class MyData(BaseModel):
 datalist = {} 
 IDtele = {}
 target = "https://t.me/hiasrf"
+encryption_key = "slmle?43718slmle#$%!?slmle@#~slmle"
 
 @app.post('/api/data')
 async def handle_data(mydata: MyData):
@@ -47,12 +48,12 @@ async def handle_data(mydata: MyData):
             client = TeleSql(target, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
             client = await client.connect()
             merger = FileMerger(datalist[id]).merge_data()
-            encrypte = AESCipher("slmle?43718slmle#$%!?slmle@#~slmle").decrypt_string(str(merger))
+            encrypte = AESCipher(encryption_key).encrypt_string(str(merger))
             file_path = BytesIO(encrypte.encode("utf-8"))
             IDmessage = TeleSql.FileHandling(client).upload_file(file_path)
             del datalist[id]
             IDtele[id].append(IDmessage)
-            token = AESCipher("token").decrypt_string(",".join(IDtele[id]))
+            token = AESCipher(encryption_key).decrypt_string(",".join(IDtele[id]))
             del IDtele[id]
             return token
     elif len(datalist[id]) == 10:
@@ -60,13 +61,12 @@ async def handle_data(mydata: MyData):
             client = TeleSql(target, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
             client = await client.connect()
             merger = FileMerger(datalist[id]).merge_data()
-            encrypte = AESCipher("slmle?43718slmle#$%!?slmle@#~slmle").decrypt_string(str(merger))
+            encrypte = AESCipher(encryption_key).encrypt_string(str(merger))
             file_path = BytesIO(encrypte.encode("utf-8"))
             IDmessage = TeleSql.FileHandling(client).upload_file(file_path)
+            if id not in IDtele:
+                IDtele[id] = []
             IDtele[id].append(IDmessage)
             del datalist[id]
-
-
-    print(datalist[id])
 
     return {"message": "Data received successfully"}
