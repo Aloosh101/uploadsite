@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fun import AESCipher, FileMerger, TeleSql
+from utils import AESCipher, FileMerger, TeleSql
 from pydantic import BaseModel
 import tempfile
 import os
@@ -31,13 +31,14 @@ data_list = {}
 data_parts = 10
 id_tele = {}
 
-# telegram target and encryption key
-target = "@hiasrf"
-encryption_key = "slmle?43718slmle#$%!?slmle@#~slmle"
-
+# Environment variables
+target = os.environ['USERNAME_TARGET'] 
+encryption_key = os.environ['PRIVATE_ENCRYPTION_KET']
+api_id = os.environ["TELE_API_ID"]
+api_hash = os.environ["TELE_API_HASH"]
 
 @app.post('/api/data')
-async def data_storage(mydata: MyData):
+async def files_storage(mydata: MyData):
 
     #check if id exist
     id = mydata.id
@@ -55,7 +56,7 @@ async def data_storage(mydata: MyData):
     if message == "done":
             
             #connect telegramapi
-            client = TeleSql(target, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
+            client = TeleSql(target, session="session_name.session", api_id=api_id, api_hash=api_hash)
             client = await client.connect()
 
             #handle data
@@ -94,7 +95,7 @@ async def data_storage(mydata: MyData):
     elif len(data_list[id]) >= data_parts:
             
             #connect telegramapi
-            client = TeleSql(target, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
+            client = TeleSql(target, session="session_name.session", api_id=api_id, api_hash=api_hash)
             client = await client.connect()
             
             #handle data
@@ -112,12 +113,34 @@ async def data_storage(mydata: MyData):
             
             #clear data_list
             if id not in id_tele:
-                id_tele[id] = []
-            
+                id_tele[id] = []                
+ 
             #save ID message
             id_tele[id].append(str(id_message))
 
             #disconnect
             client.disconnect()
             del data_list[id]
+
     return {"message": "Data received successfully"}
+
+@app.get("/api/data")
+async def files_get(token: str):
+     
+    #decrypt token
+    decrypted_token = AESCipher(encryption_key).decrypt_string(token)
+    ids = decrypted_token.split(",")
+
+    #connect telegramapi
+    client = TeleSql(target, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
+    client = await client.connect()
+
+    #get files
+    
+    
+
+    #disconnect
+    client.disconnect()
+
+    return {"":""}
+

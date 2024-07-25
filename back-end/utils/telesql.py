@@ -96,16 +96,3 @@ class TeleSql:
 
             except Exception as e:
                 error(f"Failed to get message: {e}")
-
-# async def main():
-#     # Example of using the TeleSql class to send a file
-#     client = TeleSql(-1002070698546, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
-#     client = await client.connect()
-    # a = ["k","j","h","g","f","d"]
-    # message_ids = [await TeleSql.DataHandling(client).send_message(message) for message in (a+a+a)*1000]
-    #message_id = await TeleSql.DataHandling(client).send_message("gg")
-    # print(len(message_ids))
-    #print(await TeleSql.DataHandling(client).get_message(message_id))
-#     client.disconnect()
-# if __name__ == "__main__":
-#     asyncio.run(main())
