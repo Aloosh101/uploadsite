@@ -1,9 +1,11 @@
+import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from utils import AESCipher, FileMerger, TeleSql
 from pydantic import BaseModel
 import tempfile
 import os
+import uvicorn
 
 app = FastAPI()
 
@@ -36,10 +38,20 @@ target = os.environ['USERNAME_TARGET']
 encryption_key = os.environ['PRIVATE_ENCRYPTION_KET']
 api_id = os.environ["TELE_API_ID"]
 api_hash = os.environ["TELE_API_HASH"]
+client = None
+
+async def connect():
+    global client
+    client = TeleSql(target, session="session_name.session", api_id=api_id, api_hash=api_hash)
+    client = await client.connect()
+
+
+
 
 @app.post('/api/data')
 async def files_storage(mydata: MyData):
-
+    if not client:
+        await connect()
     #check if id exist
     id = mydata.id
     data = mydata.data
@@ -55,9 +67,6 @@ async def files_storage(mydata: MyData):
     #All data has been sent
     if message == "done":
             
-            #connect telegramapi
-            client = TeleSql(target, session="session_name.session", api_id=api_id, api_hash=api_hash)
-            client = await client.connect()
 
             #handle data
             merger = FileMerger(data_list[id]).merge_data()
@@ -85,19 +94,15 @@ async def files_storage(mydata: MyData):
             #encrypt ids and create token
             token = AESCipher(encryption_key).encrypt_string(",".join(id_tele[id]))
             
-            #clear id_tele and disconnect
+            #clear id_tele
             del id_tele[id]
-            client.disconnect()
+
 
             return {"token": token}
     
     #if less than data
     elif len(data_list[id]) >= data_parts:
-            
-            #connect telegramapi
-            client = TeleSql(target, session="session_name.session", api_id=api_id, api_hash=api_hash)
-            client = await client.connect()
-            
+                                 
             #handle data
             merger = FileMerger(data_list[id]).merge_data()
             encrypte = AESCipher(encryption_key).encrypt_string(str(merger))
@@ -118,29 +123,22 @@ async def files_storage(mydata: MyData):
             #save ID message
             id_tele[id].append(str(id_message))
 
-            #disconnect
-            client.disconnect()
+
             del data_list[id]
 
     return {"message": "Data received successfully"}
 
 @app.get("/api/data")
 async def files_get(token: str):
-     
+    if not client:
+        await connect()
     #decrypt token
     decrypted_token = AESCipher(encryption_key).decrypt_string(token)
     ids = decrypted_token.split(",")
-
-    #connect telegramapi
-    client = TeleSql(target, session="session_name.session", api_id=25153583, api_hash="35543407ec1e319a3927f267183adb5d")
-    client = await client.connect()
-
-    #get files
-    
     
 
-    #disconnect
-    client.disconnect()
-
+    
     return {"":""}
 
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)
